@@ -3,6 +3,12 @@ var currentGameWindow = document.getElementById("game-area");
 var scoreWindow = document.getElementById("score-area");
 var guessedLettersWindow = document.getElementById("guessed-letters-area");
 
+// I'm really not clear on why the path requires linking like this instead of ../sounds/notapsychic.m4a - perhaps has to do with exactly how files are actually linked in browser
+var notAPsychicSound = new Audio("assets/sounds/notapsychic.m4a");
+var propheciesTrueSound = new Audio("assets/sounds/propheciestrue.m4a");
+var backroundMusic = new Audio("assets/sounds/xfilesthemeshortbackground.mp3");
+// Todo: add fallback option for old computers that don't support mp3 or m4a?
+
 var psychicGame = {
 	"alphabet": ["a", "b", "c", "d", "e", "f", "g", "h", "i", "j", "k", "l", "m", "n", "o", "p", "q", "r", "s", "t", "u", "v", "w", "x", "y", "z"],
 	"gameInProgress": false,
@@ -12,7 +18,11 @@ var psychicGame = {
 	"playerLosses": 0,
 	"playerWins": 0,
 	"playerWon": false,
+	"playSounds": false,
 	"secretLetter": "null",
+	// "notAPsychicSound": new Audio("assets/sounds/notapsychic.m4a"),
+	// "propheciesTrueSound": new Audio("assets/sounds/propheciestrue.m4a"),
+	// "backgroundMusic": new Audio("assets/sounds/xfilesthemeshortbackground.mp3"),
 
 	displayCurrentGuesses: function() {
 		if (psychicGame.gameInProgress) {
@@ -46,6 +56,11 @@ var psychicGame = {
 
 	gameIsLost: function() {
 		psychicGame.gameInProgress = false;
+		if (psychicGame.playSounds) {
+			backroundMusic.pause();
+			notAPsychicSound.load(); // loading to ensure we start from beginning
+			notAPsychicSound.play();
+		}
 		instructionWindow.innerHTML = "<p>Sorry, you have lost the game. My letter was " + psychicGame.secretLetter + ". Press RETURN to start a new game.</p>";
 		psychicGame.playerLosses++;
 		psychicGame.displayScore();
@@ -53,6 +68,11 @@ var psychicGame = {
 
 	gameIsWon: function() {
 		psychicGame.gameInProgress = false;
+		if (psychicGame.playSounds) {
+			backroundMusic.pause();
+			propheciesTrueSound.load();
+			propheciesTrueSound.play();
+		}
 		instructionWindow.innerHTML = "<p>Congratulations, " + psychicGame.secretLetter + " was my letter. Press RETURN to start a new game.</p>";
 		guessedLettersWindow.innerHTML = "";
 		psychicGame.playerWins++;
@@ -64,6 +84,10 @@ var psychicGame = {
 	},
 
 	startNewGame: function() {
+		if (psychicGame.playSounds && backroundMusic.paused) { // don't re-start if theme is already playing or sound is disabled
+			backroundMusic.load(); // reload to start theme at the beginning
+			backroundMusic.play();
+		}
 		psychicGame.numOfGuesses = 0;
 		psychicGame.gameInProgress = true;
 		psychicGame.secretLetter = 'a'; // todo: make this random.
@@ -108,3 +132,30 @@ document.onkeyup = function(event) {
 		psychicGame.userGuesses(userKeyPress);
 	}
 }
+
+document.getElementById("sound-enabled").onclick = function() {
+	psychicGame.playSounds = true;
+	backroundMusic.load();
+	backroundMusic.play();
+	// console.log(event);
+	// if (event.returnValue == true) {
+	// 	alert("Sound enabled.");
+	// }
+}
+
+document.getElementById("sound-disabled").onclick = function() {
+	psychicGame.playSounds = false;
+	notAPsychicSound.pause();
+	propheciesTrueSound.pause();
+	backroundMusic.pause();
+	// console.log(event);
+	// if (event.returnValue == false) {
+	// 	alert("Sound disabled.");
+	// }
+}
+
+
+
+
+
+
