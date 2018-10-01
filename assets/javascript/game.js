@@ -1,5 +1,3 @@
-// var playerWins = 0, playerLosses = 0;
-// guesses, playerGuess, computerSecretLetter;
 var instructionWindow = document.getElementById("instruction-area");
 var currentGameWindow = document.getElementById("game-area");
 var scoreWindow = document.getElementById("score-area");
@@ -34,7 +32,7 @@ var psychicGame = {
 					guessedLettersString += ", ";
 				}
 			}
-			guessedLettersWindow.innerHTML = "<p>You have guessed: " + guessedLettersString + ".";
+			guessedLettersWindow.innerHTML = "<p>You guessed: " + guessedLettersString + ".";
 		}
 		else {
 			guessedLettersWindow.innerHTML = "";
@@ -48,7 +46,7 @@ var psychicGame = {
 
 	gameIsLost: function() {
 		psychicGame.gameInProgress = false;
-		instructionWindow.innerHTML = "<p>Sorry, you have lost the game. Press RETURN to start a new game.</p>";
+		instructionWindow.innerHTML = "<p>Sorry, you have lost the game. My letter was " + psychicGame.secretLetter + ". Press RETURN to start a new game.</p>";
 		psychicGame.playerLosses++;
 		psychicGame.displayScore();
 	},
@@ -56,13 +54,13 @@ var psychicGame = {
 	gameIsWon: function() {
 		psychicGame.gameInProgress = false;
 		instructionWindow.innerHTML = "<p>Congratulations, " + psychicGame.secretLetter + " was my letter. Press RETURN to start a new game.</p>";
+		guessedLettersWindow.innerHTML = "";
 		psychicGame.playerWins++;
 		psychicGame.displayScore();
 	},
 
 	initializeGame: function() {
 		instructionWindow.innerHTML = "<p>Press RETURN to start a new game.</p>";
-		psychicGame.displayScore();
 	},
 
 	startNewGame: function() {
@@ -71,6 +69,7 @@ var psychicGame = {
 		psychicGame.secretLetter = 'a'; // todo: make this random.
 		psychicGame.secretLetter = psychicGame.alphabet[Math.floor(Math.random() * psychicGame.alphabet.length)];
 		instructionWindow.innerHTML = "<p>I'm thinking of a letter from a to z.</p>";
+		guessedLettersWindow.innerHTML = "";
 		psychicGame.listOfGuesses = [];
 		psychicGame.displayCurrentGuesses();
 	},
@@ -80,11 +79,14 @@ var psychicGame = {
 			psychicGame.gameIsWon();
 		}
 		else {
-			instructionWindow.innerHTML = "<p>Incorrect guess - " + guessLetter + " is not my letter.</p>";
 			if (psychicGame.listOfGuesses.indexOf(guessLetter) === -1) {
+				instructionWindow.innerHTML = "<p>Incorrect guess - " + guessLetter + " is not my letter.</p>";
 				psychicGame.numOfGuesses++;
 				psychicGame.listOfGuesses.push(guessLetter); // count the guess if the letter wasn't already guessed.
 				psychicGame.displayGuessedLetters();
+			}
+			else {
+				instructionWindow.innerHTML = "<p>You have already guessed " + guessLetter + " and it still isn't the correct letter. Some psychic you are!";
 			}
 			if (psychicGame.numOfGuesses === psychicGame.maxGuesses) {
 				psychicGame.gameIsLost();
